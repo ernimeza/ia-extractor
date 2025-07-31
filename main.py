@@ -7,10 +7,6 @@ import openai
 openai.api_key = os.environ["OPENAI_API_KEY"]
 MODEL = "gpt-4o-mini-2024-07-18"  # si aún no tienes acceso, cambia a "gpt-3.5-turbo-0125"
 
-with open("schema.json") as f:
-    SCHEMA = json.load(f)
-print(">> Loaded schema keys:", list(SCHEMA.get("properties", {}).keys()))
-
 app = FastAPI()
 
 class Req(BaseModel):
@@ -40,6 +36,6 @@ async def extract(req: Req):
         messages=messages,
         temperature=0,
         max_tokens=400,
-        response_format={"type": "json_schema", "schema": SCHEMA},
+         response_format={"type": "json_object"},
     )
     return json.loads(resp.choices[0].message.content)
