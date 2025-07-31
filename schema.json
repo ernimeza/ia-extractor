@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "properties": {
+    "operacion":        { "type": "string" },
+    "tipo_propiedad":   { "type": "string" },
+    "ciudad":           { "type": "string" },
+    "barrio":           { "type": "string" },
+    "precio":           { "type": "number" },
+    "habitaciones":     { "type": "integer" },
+    "banos":            { "type": "integer" },
+    "cocheras":         { "type": "integer" },
+    "plantas":          { "type": "integer" },
+    "m2":               { "type": "integer" },
+    "anno_construccion":{ "type": "integer" },
+    "estado":           { "type": "string" },
+    "amoblado":         { "type": "boolean" },
+    "detalles":         { "type": "string" }
+  },
+  "required": ["operacion","tipo_propiedad","ciudad"]
+}
