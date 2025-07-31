@@ -5,7 +5,7 @@ import openai
 
 # ----- Configuración -----
 openai.api_key = os.environ["OPENAI_API_KEY"]
-MODEL = "gpt-4o-mini"  # si aún no tienes acceso, cambia a "gpt-3.5-turbo-0125"
+MODEL = "gpt-4o-mini-2024-07-18"  # si aún no tienes acceso, cambia a "gpt-3.5-turbo-0125"
 
 with open("schema.json") as f:
     SCHEMA = json.load(f)
