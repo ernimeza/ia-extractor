@@ -15,12 +15,13 @@ class Req(BaseModel):
 
 @app.post("/extract")
 async def extract(req: Req):
-    # Fix image URLs to ensure they start with https://
+    # Fix image URLs to ensure they start with https:// and filter out empty/invalid ones
     fixed_images = []
     for u in req.images:
-        if u.startswith('//'):
-            u = 'https:' + u
-        fixed_images.append(u)
+        if u and isinstance(u, str) and u.strip():  # Skip if empty or not a string
+            if u.startswith('//'):
+                u = 'https:' + u
+            fixed_images.append(u)
 
     messages = [
         {"role": "system", "content": "Eres un extractor de datos inmobiliarios. Devuelve SOLO el JSON pedido."},
