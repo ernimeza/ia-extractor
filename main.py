@@ -37,4 +37,5 @@ async def extract(req: Req):
         max_tokens=400,
         response_format={"type": "json_object"},
     )
+    print("JSON de respuesta desde OpenAI:", resp.choices[0].message.content)  # Línea nueva para logs
     return json.loads(resp.choices[0].message.content)
