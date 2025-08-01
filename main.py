@@ -29,7 +29,7 @@ Eres un extractor de datos inmobiliarios experto. Analiza la descripción de tex
 
 {
   "operacion": Elige de: ['venta', 'alquiler'] (string),
-  "tipopropiedad": Tienen una s al final indicando pluralidad simplemente porque me ayuda con las url, pero en realidad se van a ver en singular gracias a un slug, Elige de: ['casas', 'departamentos', 'duplex', 'terrenos', 'oficinas', 'locales', 'edificios', 'paseos', 'depositos', 'quintas', 'estancias'] (string),
+  "tipopropiedad": Elige de: ['Casa', 'Departamento', 'Duplex', 'Terreno', 'Oficina', 'locales', 'edificios', 'paseos', 'depositos', 'quintas', 'estancias'] (string),
   "ciudad": Elige de: ['asuncion', 'luque', 'ciudad-del-este', 'encarnacion', 'san-lorenzo', 'fernando-de-la-mora', 'mariano-roque-alonso', 'san-bernardino', 'lambare', 'capiata', 'nemby'] (string),
   "barrioasu": Elige de: ['villa-morra', 'recoleta', 'carmelitas', 'las-lomas', 'las-mercedes', 'mburucuya', 'jara', 'sajonia', 'villa-aurelia', 'ycua-sati', 'obrero', 'Itá Enramada', 'Nazareth', 'San Roque', 'Vista Alegre', 'Hipódromo', 'La Encarnación', 'Tacumbú', 'Jukyty', 'La Catedral', 'Mbojuapy Tavapy', 'Dr. Gaspar Rodríguez de Francia', 'Ita Pyta Punta', 'Salvador del Mundo'] (string),
   "precio": Número en USD (integer),
