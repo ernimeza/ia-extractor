@@ -15,27 +15,25 @@ class Req(BaseModel):
 
 @app.post("/extract")
 async def extract(req: Req):
+    # Fix image URLs to ensure they start with https://
+    fixed_images = []
+    for u in req.images:
+        if u.startswith('//'):
+            u = 'https:' + u
+        fixed_images.append(u)
+
     messages = [
-        {
-            "role": "system",
-            "content": "Eres un extractor de datos inmobiliarios. Devuelve SOLO el JSON pedido."
-        },
-        {
-            "role": "user",
-            "content": [
-                {"type": "text", "text": req.description},
-                *[
-                    {"type": "image_url", "image_url": {"url": u}}
-                    for u in req.images
-                ]
-            ]
-        }
+        {"role": "system", "content": "Eres un extractor de datos inmobiliarios. Devuelve SOLO el JSON pedido."},
+        {"role": "user", "content": [
+            {"type": "text", "text": req.description},
+            *[{"type": "image_url", "image_url": {"url": u}} for u in fixed_images]
+        ]}
     ]
     resp = openai.chat.completions.create(
         model=MODEL,
         messages=messages,
         temperature=0,
         max_tokens=400,
-         response_format={"type": "json_object"},
+        response_format={"type": "json_object"},
     )
     return json.loads(resp.choices[0].message.content)
