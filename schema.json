@@ -16,5 +16,3 @@
     "amoblado":         { "type": "boolean" },
     "detalles":         { "type": "string" }
   },
-  "required": ["operacion","tipo_propiedad","ciudad"]
-}
