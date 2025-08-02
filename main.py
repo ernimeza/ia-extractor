@@ -16,12 +16,12 @@ class Req(BaseModel):
 @app.post("/extract")
 async def extract(req: Req):
     # Fix image URLs to ensure they start with https:// and filter out empty/invalid ones
-   fixed_images = []
-for u in req.images:
-    if u and isinstance(u, str) and u.strip():
-        if not u.startswith('http'):
-            u = 'https:' + u if u.startswith('//') else 'https://' + u
-        fixed_images.append(u)
+    fixed_images = []
+    for u in req.images:
+        if u and isinstance(u, str) and u.strip():  # Skip if empty or not a string
+            if u.startswith('//'):
+                u = 'https:' + u
+            fixed_images.append(u)
 
     messages = [
         {"role": "system", "content": """
