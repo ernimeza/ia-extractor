@@ -1,11 +1,11 @@
 import os, json
 from fastapi import FastAPI
 from pydantic import BaseModel
-import openai
+from openai import OpenAI
 # ----- Configuración -----
-openai.api_key = os.environ["OPENAI_API_KEY"]
 MODEL = "gpt-4o-mini-2024-07-18" # si aún no tienes acceso, cambia a "gpt-3.5-turbo-0125"
 app = FastAPI()
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 class Req(BaseModel):
     description: str
     images: list[str]
@@ -49,7 +49,7 @@ Eres un extractor de datos inmobiliarios experto. Analiza la descripción de tex
             *[{"type": "image_url", "image_url": {"url": u}} for u in fixed_images]
         ]}
     ]
-    resp = openai.chat.completions.create(
+    resp = client.chat.completions.create(
         model=MODEL,
         messages=messages,
         temperature=0,
