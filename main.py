@@ -2,31 +2,27 @@ import os, json
 from fastapi import FastAPI
 from pydantic import BaseModel
 import openai
-
 # ----- Configuración -----
 openai.api_key = os.environ["OPENAI_API_KEY"]
-MODEL = "gpt-4o-mini-2024-07-18"  # si aún no tienes acceso, cambia a "gpt-3.5-turbo-0125"
-
+MODEL = "gpt-4o-mini-2024-07-18" # si aún no tienes acceso, cambia a "gpt-3.5-turbo-0125"
 app = FastAPI()
-
 class Req(BaseModel):
     description: str
     images: list[str]
-
 @app.post("/extract")
 async def extract(req: Req):
     # Fix image URLs to ensure they start with https:// and filter out empty/invalid ones
     fixed_images = []
     for u in req.images:
-        if u and isinstance(u, str) and u.strip():  # Skip if empty or not a string
+        if u and isinstance(u, str) and u.strip(): # Skip if empty or not a string
             if u.startswith('//'):
                 u = 'https:' + u
+            elif not u.startswith('http'):
+                u = 'https://' + u
             fixed_images.append(u)
-
     messages = [
         {"role": "system", "content": """
 Eres un extractor de datos inmobiliarios experto. Analiza la descripción de texto y las imágenes para extraer/inferir info. Devuelve SOLO un objeto JSON con esta estructura EXACTA (sin campos extras, usa null si no hay data). Corrige ortografía/capitalización para coincidir con listas.
-
 {
   "operacion": Elige de: ['venta', 'alquiler'] (string),
   "tipodepropiedad": Elige exactamente de: ['casas', 'departamentos', 'duplex', 'terrenos', 'oficinas', 'locales', 'edificios', 'paseos', 'depositos', 'quintas', 'estancias'] (string),
@@ -60,5 +56,5 @@ Eres un extractor de datos inmobiliarios experto. Analiza la descripción de tex
         max_tokens=400,
         response_format={"type": "json_object"},
     )
-    print("JSON de respuesta desde OpenAI:", resp.choices[0].message.content)  # Línea nueva para logs
+    print("JSON de respuesta desde OpenAI:", resp.choices[0].message.content) # Línea nueva para logs
     return json.loads(resp.choices[0].message.content)
