@@ -8,15 +8,24 @@ MODEL = "gpt-4o-mini-2024-07-18" # si aún no tienes acceso, cambia a "gpt-3.5-t
 app = FastAPI()
 class Req(BaseModel):
     description: str
-    images: str
+    image1: str = None
+    image2: str = None
+    image3: str = None
+    image4: str = None
+    image5: str = None
+    image6: str = None
+    image7: str = None
+    image8: str = None
+    image9: str = None
+    image10: str = None
 @app.post("/extract")
 async def extract(req: Req):
-    # Split the images string by comma and strip whitespace
-    image_urls = [u.strip() for u in req.images.split(',') if u.strip()]
+    # Collect individual images into a list
+    images = [req.image1, req.image2, req.image3, req.image4, req.image5, req.image6, req.image7, req.image8, req.image9, req.image10]
     # Fix image URLs to ensure they start with https:// and filter out empty/invalid ones
     fixed_images = []
-    for u in image_urls:
-        if u and isinstance(u, str): # Skip if empty or not a string
+    for u in images:
+        if u and isinstance(u, str) and u.strip(): # Skip if empty or not a string
             if u.startswith('//'):
                 u = 'https:' + u
             elif not u.startswith('http'):
