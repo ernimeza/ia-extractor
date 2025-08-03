@@ -1,4 +1,6 @@
 import os, json
+import requests
+import base64
 from fastapi import FastAPI
 from pydantic import BaseModel
 import openai
@@ -31,6 +33,24 @@ async def extract(req: Req):
             elif not u.startswith('http'):
                 u = 'https://' + u
             fixed_images.append(u)
+    # Download images and convert to base64 data URIs
+    image_contents = []
+    for u in fixed_images:
+        try:
+            response = requests.get(u, timeout=10)
+            if response.status_code == 200:
+                img_data = base64.b64encode(response.content).decode('utf-8')
+                # Determine MIME type based on extension (adjust if needed for other formats)
+                if u.lower().endswith('.jpg') or u.lower().endswith('.jpeg'):
+                    mime_type = 'image/jpeg'
+                elif u.lower().endswith('.png'):
+                    mime_type = 'image/png'
+                else:
+                    mime_type = 'image/jpeg'  # Default to JPEG
+                image_contents.append({"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{img_data}"}})
+        except Exception as e:
+            print(f"Error downloading {u}: {e}")  # Log para depuración
+            continue
     messages = [
         {"role": "system", "content": """
 Eres un extractor de datos inmobiliarios experto. Analiza la descripción de texto y las imágenes para extraer/inferir info. Devuelve SOLO un objeto JSON con esta estructura EXACTA (sin campos extras, usa null si no hay data). Corrige ortografía/capitalización para coincidir con listas.
@@ -57,7 +77,7 @@ Eres un extractor de datos inmobiliarios experto. Analiza la descripción de tex
 """},
         {"role": "user", "content": [
             {"type": "text", "text": req.description},
-            *[{"type": "image_url", "image_url": {"url": u}} for u in fixed_images]
+            *image_contents
         ]}
     ]
     resp = openai.chat.completions.create(
@@ -67,5 +87,10 @@ Eres un extractor de datos inmobiliarios experto. Analiza la descripción de tex
         max_tokens=400,
         response_format={"type": "json_object"},
     )
+    extracted_data = json.loads(resp.choices[0].message.content)
     print("JSON de respuesta desde OpenAI:", resp.choices[0].message.content) # Línea nueva para logs
-    return json.loads(resp.choices[0].message.content)
+    # Return the extracted data plus the fixed images as a list
+    return {
+        **extracted_data,
+        "images": fixed_images
+    }
