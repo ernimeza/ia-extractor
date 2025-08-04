@@ -1,6 +1,7 @@
 import os, json
 from fastapi import FastAPI
 from pydantic import BaseModel
+from typing import Optional
 import openai
 
 # ----- Configuración -----
@@ -11,22 +12,34 @@ app = FastAPI()
 
 class Req(BaseModel):
     description: str
-    images: list[str]
+    image1: Optional[str] = None
+    image2: Optional[str] = None
+    image3: Optional[str] = None
+    image4: Optional[str] = None
+    image5: Optional[str] = None
+    image6: Optional[str] = None
+    image7: Optional[str] = None
+    image8: Optional[str] = None
+    image9: Optional[str] = None
+    image10: Optional[str] = None
 
 @app.post("/extract")
 async def extract(req: Req):
-    # Fix image URLs to ensure they start with https:// and filter out empty/invalid ones
+    # Collect and fix image URLs
+    images = [
+        req.image1, req.image2, req.image3, req.image4, req.image5,
+        req.image6, req.image7, req.image8, req.image9, req.image10
+    ]
     fixed_images = []
-    for u in req.images:
-        if u and isinstance(u, str) and u.strip():  # Skip if empty or not a string
+    for u in images:
+        if u and isinstance(u, str) and u.strip():  # Skip if None, empty or not a string
             if u.startswith('//'):
                 u = 'https:' + u
             fixed_images.append(u)
 
     messages = [
         {"role": "system", "content": """
-Eres un extractor de datos inmobiliarios experto. Analiza la descripción de texto y las imágenes para extraer/inferir info. Devuelve SOLO un objeto JSON con esta estructura EXACTA (sin campos extras, usa null si no hay data). Corrige ortografía/capitalización para coincidir con listas.
-
+Eres un extractor de datos inmobiliarios experto. Analiza la descripción de texto y las imágenes para extraer/inferir info. Devuelve SOLO un objeto JSON con esta estructura EXACTA (sin campos extras, usa null si no hay data). Corrige ortografía/capitalización para coincidir con listas. Incluye las URLs de imágenes proporcionadas en los campos image1 a image10 (usa null si no hay imagen en esa posición).
 {
   "operacion": Elige de: ['venta', 'alquiler'] (string),
   "tipodepropiedad": Elige exactamente de: ['casas', 'departamentos', 'duplex', 'terrenos', 'oficinas', 'locales', 'edificios', 'paseos', 'depositos', 'quintas', 'estancias'] (string),
@@ -45,7 +58,17 @@ Eres un extractor de datos inmobiliarios experto. Analiza la descripción de tex
   "nombredeledificio": Nombre del edificio (string),
   "piso": Piso en el que se encuentra (string),
   "estilo": Elige de: ['Moderna', 'Minimalista', 'Clásica', 'De campo'] (string),
-  "divisa": Elige de: ['GS', '$'] (string)
+  "divisa": Elige de: ['GS', '$'] (string),
+  "image1": URL de la imagen 1 o null (string),
+  "image2": URL de la imagen 2 o null (string),
+  "image3": URL de la imagen 3 o null (string),
+  "image4": URL de la imagen 4 o null (string),
+  "image5": URL de la imagen 5 o null (string),
+  "image6": URL de la imagen 6 o null (string),
+  "image7": URL de la imagen 7 o null (string),
+  "image8": URL de la imagen 8 o null (string),
+  "image9": URL de la imagen 9 o null (string),
+  "image10": URL de la imagen 10 o null (string)
 }
 """},
         {"role": "user", "content": [
@@ -53,6 +76,7 @@ Eres un extractor de datos inmobiliarios experto. Analiza la descripción de tex
             *[{"type": "image_url", "image_url": {"url": u}} for u in fixed_images]
         ]}
     ]
+
     resp = openai.chat.completions.create(
         model=MODEL,
         messages=messages,
