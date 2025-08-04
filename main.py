@@ -26,7 +26,7 @@ Eres un extractor de datos inmobiliarios experto. Analiza la descripción de tex
   "m2": Número de m² (integer),
   "anno_construccion": Año de construcción (integer),
   "estado": Elige de: ['A estrenar', 'Perfecto', 'Muy bueno', 'Bueno'] (string),
-  "amoblado": true si amoblado, false si no (boolean),
+  "amoblado": Elige de: ['Sí', 'No'] (string)
   "descripcion": Resumen completo de la propiedad, bien estructurado y yendo al grano (string),
   "nombredeledificio": Nombre del edificio (string),
   "piso": Piso en el que se encuentra (string),
