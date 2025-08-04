@@ -25,7 +25,11 @@ Eres un extractor de datos inmobiliarios experto. Analiza la descripción de tex
   "plantas": Elige de: ['1', '2', '3', '4', '5', '+5'] (string),
   "m2": Número de m² (integer),
   "anno_construccion": Año de construcción (integer),
+  "hectareas": Hectáreas (integer)
+  "m2t": Número de m² del terreno (integer)
+  "m2t": Número de m² de construcción, (integer)
   "estado": Elige de: ['A estrenar', 'Perfecto', 'Muy bueno', 'Bueno'] (string),
+  "amenidades": Elige de: ['1', '2', '3', '4', '5', '+5'] (string),
   "amoblado": Elige de: ['Sí', 'No'] (string)
   "descripcion": Resumen completo de la propiedad, bien estructurado y yendo al grano (string),
   "nombredeledificio": Nombre del edificio (string),
