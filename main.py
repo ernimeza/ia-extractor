@@ -47,7 +47,7 @@ Eres un extractor de datos inmobiliarios experto. Analiza la descripción de tex
         model=MODEL,
         messages=messages,
         temperature=0,
-        max_tokens=2000,
+        max_tokens=400,
         response_format={"type": "json_object"},
     )
     print("JSON de respuesta desde OpenAI:", resp.choices[0].message.content) # Línea nueva para logs
