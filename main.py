@@ -1,8 +1,12 @@
-import os, json
+import os, json, logging
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Optional
 import openai
+
+# Configura logging básico (salida a stdout con nivel INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # ----- Configuración -----
 openai.api_key = os.environ["OPENAI_API_KEY"]
@@ -36,10 +40,14 @@ async def extract(req: Req):
             if u.startswith('//'):
                 u = 'https:' + u
             fixed_images.append(u)
-
+    
+    # Log las URLs entrantes para depuración
+    logger.info("URLs de imágenes recibidas: %s", fixed_images)
+    
     messages = [
         {"role": "system", "content": """
-Eres un extractor de datos inmobiliarios experto. Analiza la descripción de texto y las imágenes para extraer/inferir info. Devuelve SOLO un objeto JSON con esta estructura EXACTA (sin campos extras, usa null si no hay data). Corrige ortografía/capitalización para coincidir con listas. Incluye las URLs de imágenes proporcionadas en los campos image1 a image10 (usa null si no hay imagen en esa posición).
+Eres un extractor de datos inmobiliarios experto. Analiza la descripción de texto y las imágenes para extraer/inferir info. Devuelve SOLO un objeto JSON con esta estructura EXACTA (sin campos extras, usa null si no hay data). Corrige ortografía/capitalización para coincidir con listas. 
+SIEMPRE incluye las URLs exactas de las imágenes proporcionadas en los campos image1 a image10, incluso si no puedes analizar las imágenes o si parecen irrelevantes (cópialas directamente; usa null SOLO si no se proporcionó ninguna URL en esa posición).
 {
   "operacion": Elige de: ['venta', 'alquiler'] (string),
   "tipodepropiedad": Elige exactamente de: ['casas', 'departamentos', 'duplex', 'terrenos', 'oficinas', 'locales', 'edificios', 'paseos', 'depositos', 'quintas', 'estancias'] (string),
@@ -76,7 +84,7 @@ Eres un extractor de datos inmobiliarios experto. Analiza la descripción de tex
             *[{"type": "image_url", "image_url": {"url": u}} for u in fixed_images]
         ]}
     ]
-
+    
     try:
         resp = openai.chat.completions.create(
             model=MODEL,
@@ -85,7 +93,9 @@ Eres un extractor de datos inmobiliarios experto. Analiza la descripción de tex
             max_tokens=400,
             response_format={"type": "json_object"},
         )
-        print("JSON de respuesta desde OpenAI:", resp.choices[0].message.content)  # Logs
-        return json.loads(resp.choices[0].message.content)
+        json_response = resp.choices[0].message.content
+        logger.info("JSON de respuesta desde OpenAI: %s", json_response)  # Log completo del JSON
+        return json.loads(json_response)
     except Exception as e:
-        return {"error": str(e)}  # Manejo de errores para evitar 500
+        logger.error("Error en llamada a OpenAI: %s", str(e))  # Log de errores
+        return {"error": str(e)}
