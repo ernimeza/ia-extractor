@@ -31,18 +31,7 @@ Eres un extractor de datos inmobiliarios experto. Analiza la descripción de tex
   "estado": Elige exclusivamente de las siguientes opciones, si no hay información seleeciona la que mas se asemeje: ['A estrenar', 'Perfecto', 'Muy bueno', 'Bueno'] (string),
   "amenidades": Elige las opciones entre: ['Acceso controlado', 'Área de coworking', 'Área de parrilla', 'Área de yoga', 'Área verde', 'Bar', 'Bodega', 'Cancha de pádel', 'Cancha de tenis', 'Cancha de fútbol', 'Cerradura digital', 'Cine', 'Club house', 'Estacionamiento techado', 'Generador', 'Gimnasio', 'Laguna artificial', 'Laguna natural', 'Lavandería', 'Parque infantil', 'piscina', 'Quincho', 'Salón de eventos', 'Sala de juegos', 'Sala de masajes', 'Sala de reuniones', 'Sauna', 'Seguridad 24/7', 'Solarium', 'Spa', 'Terraza', 'Wi-Fi', 'Café', 'Business center'] (list),
   "amoblado": Elige de: ['Sí', 'No'] (string)
-  "descripcion": Linda descripción de la propiedad, bien estructurada, dejando una linea al concluiir el parrafo yendo al grano, con emojies y checklist con beneficios si hay contenido (ej. ¡Moderno Departamento en Venta en Herrera, Asunción! 🏠✨
-Hermoso departamento en Residencias del Este (piso 4), barrio Herrera, sobre Boggiani esquina RI18 Pitiantuta. Construido en 2015, en excelente estado, con 200 m² en 2 plantas, 3 habitaciones, 2 baños, 2 cocheras y completamente amoblado. Disfruta de un living luminoso con balcón panorámico 🌅, cocina integrada moderna 🍳, amplio jardín 🌳 y amenities como piscina 🏊‍♂️, gimnasio 💪, parrilla 🔥 y seguridad 24/7 👮‍♂️.
-Precio: 120,000 USD 💰
-
-¡Contáctanos! Captador: Carlos Benegas 📞 0993444432.
-Checklist Destacado ✅
-
-📍 Ubicación: Barrio Herrera, Asunción.
-📏 Espacio: 200 m², 3 hab., 2 baños, 2 cocheras.
-✨ Detalles: Balcón, jardín, cocina integrada.
-🏆 Amenities: Piscina, gimnasio, parrilla, seguridad 24/7.
-🛋️ Estado: Amoblado, excelente condición.) (string),
+  "descripcion": Linda descripción de la propiedad, bien estructurada, dejando una linea al concluiir el parrafo yendo al grano, con emojies y checklist con beneficios si hay contenido (string),
   "nombredeledificio": Nombre del edificio (string),
   "piso": Piso en el que se encuentra (string),
   "estilo": Elige de: ['Moderna', 'Minimalista', 'Clásica', 'De campo'] (string),
@@ -58,7 +47,7 @@ Checklist Destacado ✅
         model=MODEL,
         messages=messages,
         temperature=0,
-        max_tokens=1000,
+        max_tokens=2000,
         response_format={"type": "json_object"},
     )
     print("JSON de respuesta desde OpenAI:", resp.choices[0].message.content) # Línea nueva para logs
