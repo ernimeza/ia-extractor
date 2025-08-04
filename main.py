@@ -6,7 +6,7 @@ import openai
 
 # ----- Configuración -----
 openai.api_key = os.environ["OPENAI_API_KEY"]
-MODEL = "gpt-4o-mini-2024-07-18"  # si aún no tienes acceso, cambia a "gpt-3.5-turbo-0125"
+MODEL = "gpt-4o-mini"  # Versión general para compatibilidad
 
 app = FastAPI()
 
@@ -77,12 +77,15 @@ Eres un extractor de datos inmobiliarios experto. Analiza la descripción de tex
         ]}
     ]
 
-    resp = openai.chat.completions.create(
-        model=MODEL,
-        messages=messages,
-        temperature=0,
-        max_tokens=400,
-        response_format={"type": "json_object"},
-    )
-    print("JSON de respuesta desde OpenAI:", resp.choices[0].message.content)  # Línea nueva para logs
-    return json.loads(resp.choices[0].message.content)
+    try:
+        resp = openai.chat.completions.create(
+            model=MODEL,
+            messages=messages,
+            temperature=0,
+            max_tokens=400,
+            response_format={"type": "json_object"},
+        )
+        print("JSON de respuesta desde OpenAI:", resp.choices[0].message.content)  # Logs
+        return json.loads(resp.choices[0].message.content)
+    except Exception as e:
+        return {"error": str(e)}  # Manejo de errores para evitar 500
