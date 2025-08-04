@@ -58,7 +58,7 @@ Checklist Destacado ✅
         model=MODEL,
         messages=messages,
         temperature=0,
-        max_tokens=400,
+        max_tokens=1000,
         response_format={"type": "json_object"},
     )
     print("JSON de respuesta desde OpenAI:", resp.choices[0].message.content) # Línea nueva para logs
