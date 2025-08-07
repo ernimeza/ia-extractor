@@ -1,18 +1,16 @@
-import os, json
-from fastapi import FastAPI
+import os, json, base64, io
+from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
 import openai
+
 # ----- Configuración -----
 openai.api_key = os.environ["OPENAI_API_KEY"]
-MODEL = "gpt-4o-mini-2024-07-18" # si aún no tienes acceso, cambia a "gpt-3.5-turbo-0125"
+MODEL = "gpt-4o"  # Usa gpt-4o para soporte de visión; cambia a "gpt-4o-mini-2024-07-18" si no tienes acceso
 app = FastAPI()
-class Req(BaseModel):
-    description: str
-@app.post("/extract")
-async def extract(req: Req):
-    messages = [
-        {"role": "system", "content": """
-Eres un extractor de datos inmobiliarios experto. Analiza la descripción de texto para extraer/inferir info. Devuelve SOLO un objeto JSON con esta estructura EXACTA (sin campos extras, usa null si no hay data). Corrige ortografía/capitalización para coincidir con listas.
+
+# Prompt system común (igual para ambos endpoints)
+SYSTEM_PROMPT = """
+Eres un extractor de datos inmobiliarios experto. Analiza la descripción de texto o el contenido de la imagen para extraer/inferir info. Devuelve SOLO un objeto JSON con esta estructura EXACTA (sin campos extras, usa null si no hay data). Corrige ortografía/capitalización para coincidir con listas.
 {
   "operacion": Elige de: ['venta', 'alquiler'] (string),
   "tipodepropiedad": Elige exactamente de: ['casas', 'departamentos', 'duplex', 'terrenos', 'oficinas', 'locales', 'edificios', 'paseos', 'depositos', 'quintas', 'estancias'] (string),
@@ -25,23 +23,30 @@ Eres un extractor de datos inmobiliarios experto. Analiza la descripción de tex
   "plantas": Elige de: ['1', '2', '3', '4', '5', '+5'] (string),
   "m2": Número de m² (integer),
   "anno_construccion": Año de construcción (integer),
-  "hectareas": Hectáreas (integer)
-  "m2t": Número de m² del terreno (integer)
-  "m2t": Número de m² de construcción, (integer)
-  "estado": Elige exclusivamente de las siguientes opciones, si no hay información seleeciona la que mas se asemeje: ['A estrenar', 'Perfecto', 'Muy bueno', 'Bueno'] (string),
+  "hectareas": Hectáreas (integer),
+  "m2t": Número de m² del terreno (integer),
+  "m2c": Número de m² de construcción (integer),  # Cambié "m2t" duplicado a "m2c" para claridad
+  "estado": Elige exclusivamente de las siguientes opciones, si no hay información selecciona la que mas se asemeje: ['A estrenar', 'Perfecto', 'Muy bueno', 'Bueno'] (string),
   "amenidades": Elige las opciones entre: ['Acceso controlado', 'Área de coworking', 'Área de parrilla', 'Área de yoga', 'Área verde', 'Bar', 'Bodega', 'Cancha de pádel', 'Cancha de tenis', 'Cancha de fútbol', 'Cerradura digital', 'Cine', 'Club house', 'Estacionamiento techado', 'Generador', 'Gimnasio', 'Laguna artificial', 'Laguna natural', 'Lavandería', 'Parque infantil', 'piscina', 'Quincho', 'Salón de eventos', 'Sala de juegos', 'Sala de masajes', 'Sala de reuniones', 'Sauna', 'Seguridad 24/7', 'Solarium', 'Spa', 'Terraza', 'Wi-Fi', 'Café', 'Business center'] (list),
-  "amoblado": Elige de: ['Sí', 'No'] (string)
-  "descripcion": Linda descripción de la propiedad, bien estructurada, dejando una linea al concluiir el parrafo yendo al grano, con emojies y checklist con beneficios si hay contenido (string),
+  "amoblado": Elige de: ['Sí', 'No'] (string),
+  "descripcion": Linda descripción de la propiedad, bien estructurada, dejando una linea al concluir el parrafo yendo al grano, con emojies y checklist con beneficios si hay contenido (string),
   "nombredeledificio": Nombre del edificio (string),
   "piso": Piso en el que se encuentra (string),
   "estilo": Elige de: ['Moderna', 'Minimalista', 'Clásica', 'De campo'] (string),
   "divisa": Elige de: ['GS', '$'] (string),
   "ubicacion": Dirección completa formateada como en Google Maps (string)
 }
-"""},
-        {"role": "user", "content": [
-            {"type": "text", "text": req.description}
-        ]}
+"""
+
+class Req(BaseModel):
+    description: str
+
+# Endpoint original para extracción desde texto
+@app.post("/extract")
+async def extract(req: Req):
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": [{"type": "text", "text": req.description}]}
     ]
     resp = openai.chat.completions.create(
         model=MODEL,
@@ -50,5 +55,44 @@ Eres un extractor de datos inmobiliarios experto. Analiza la descripción de tex
         max_tokens=2000,
         response_format={"type": "json_object"},
     )
-    print("JSON de respuesta desde OpenAI:", resp.choices[0].message.content) # Línea nueva para logs
+    print("JSON de respuesta desde OpenAI (text):", resp.choices[0].message.content)
     return json.loads(resp.choices[0].message.content)
+
+# Nuevo endpoint para extracción desde imagen (solo imágenes, no PDFs)
+@app.post("/extract-file")
+async def extract_file(file: UploadFile = File(None)):
+    if not file:
+        return {"error": "No se proporcionó ningún archivo"}
+    
+    filename = file.filename.lower()
+    if filename.endswith('.pdf'):
+        return {"error": "Solo se permiten imágenes, no PDFs"}
+    
+    content = await file.read()
+    
+    # Asumir que es una imagen y codificar directamente a base64
+    base64_str = base64.b64encode(content).decode('utf-8')
+    
+    user_content = [
+        {"type": "text", "text": "Extrae los datos inmobiliarios de esta imagen (ficha técnica)."}
+    ] + [
+        {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{base64_str}", "detail": "low"}}
+    ]
+    
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": user_content}
+    ]
+    
+    try:
+        resp = openai.chat.completions.create(
+            model=MODEL,
+            messages=messages,
+            temperature=0,
+            max_tokens=2000,
+            response_format={"type": "json_object"},
+        )
+        print("JSON de respuesta desde OpenAI (file):", resp.choices[0].message.content)
+        return json.loads(resp.choices[0].message.content)
+    except Exception as e:
+        return {"error": f"Error en llamada a OpenAI: {str(e)}"}
