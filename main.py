@@ -3,23 +3,21 @@ from typing import Any, Dict, List
 
 from fastapi import FastAPI
 from pydantic import BaseModel
+
+# ------- Compatibilidad SDK -------
+NEW_SDK = True
 try:
-    # SDK moderno
     from openai import OpenAI
-    _HAS_NEW_SDK = True
+    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 except Exception:
-    # SDK muy viejo (<=0.x)
-    import openai  # type: ignore
-    _HAS_NEW_SDK = False
+    import openai as oai  # SDK legacy 0.x
+    oai.api_key = os.environ["OPENAI_API_KEY"]
+    NEW_SDK = False
 
-# ---------------- Config ----------------
-DEFAULT_MODEL = os.getenv("OPENAI_MODEL", "gpt-5-mini")  # usa "gpt-5" si querés máxima precisión
-OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
+# ------- Modelo por defecto -------
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-5-mini")  # gpt-5 para máxima precisión
 
-if _HAS_NEW_SDK:
-    client = OpenAI(api_key=OPENAI_API_KEY)
-
-# ---------- Listas/Enums ----------
+# ------- Catálogos -------
 OPERACIONES = ["venta", "alquiler"]
 TIPOS = ['casas','departamentos','duplex','terrenos','oficinas','locales','edificios','paseos','depositos','quintas','estancias']
 HAB_OPC = ['1','2','3','4','5','6','7','8','9','10','monoambiente','+10']
@@ -41,11 +39,11 @@ BARRIOS_ASU = [
     'cañada-del-ybyray','carlos-a-lopez','catedral','ciudad-nueva','dr-francia','la-encarnación','general-diaz',
     'herrera','hipodromo','ita-enramada','ita-pyta-punta','jukyty','los-laureles','loma-pyta','madame-lynch',
     'manora','mcal-estigarribia','mcal-lopez','mbocayaty','mburicao','nazareth','ñu-guazu','panambi-reta',
-    'panambi-vera','pettirossi','pinoza','pirizal','republicano','chacarita','roberto-l-pettit',
-    'salvador-del-mundo','san-antonio','san-blas','san-cayetano','san-cristobal','san-jorge','san-juan',
-    'san-pablo','san-roque','san-vicente','santa-ana','santa-librada','santa-maria','santa-rosa',
-    'santisima-trinidad','santo-domingo','silvio-pettirossi','tablada-nueva','tacumbu','tembetary','terminal',
-    'virgen-de-fatima','virgen-de-la-asuncion','virgen-del-huerto','vista-alegre','ytay','zeballos-cue'
+    'panambi-vera','pettirossi','pinoza','pirizal','republicano','chacarita','roberto-l-pettit','salvador-del-mundo',
+    'san-antonio','san-blas','san-cayetano','san-cristobal','san-jorge','san-juan','san-pablo','san-roque','san-vicente',
+    'santa-ana','santa-librada','santa-maria','santa-rosa','santisima-trinidad','santo-domingo','silvio-pettirossi',
+    'tablada-nueva','tacumbu','tembetary','terminal','virgen-de-fatima','virgen-de-la-asuncion','virgen-del-huerto',
+    'vista-alegre','ytay','zeballos-cue'
 ]
 CIUDADES = [
     'asuncion','luque','ciudad-del-este','encarnacion','san-lorenzo','fernando-de-la-mora','mariano-roque-alonso',
@@ -68,10 +66,10 @@ CIUDADES = [
     'mbocayaty-del-guaira','maracana','mariscal-estigarribia','mariscal-francisco-solano-lopez','mayor-julio-d-otano',
     'mayor-jose-dejesus-martinez','mbocayaty','minga-guazu','natalicio-talavera','nanawa','naranjal','nueva-alborada',
     'natalio','nueva-asuncion','nueva-colombia','nueva-italia','nueva-germania','nueva-toledo','nacunday','numi',
-    'olbligado','paso-barreto','paso-de-patria','paso-yobai','pedro-juan-caballero','pirapo','pirayu','pilar',
-    'piribebuy','pozo-colorado','presidente-franco','primero-de-marzo','puerto-adela','puerto-casado','puerto-irala',
-    'puerto-pinasco','quyquyho','raul-arsenio-oviedo','repatriacion','R-I-3-corrales','san-alberto','salto-del-guaira',
-    'san-antonio','san-carlos-del-apa','san-cosme-y-damian','san-estanislao-santani','san-joaquin','san-jose-obrero',
+    'olbligado','paso-barreto','paso-de-patria','paso-yobai','pedro-juan-caballero','pirapo','pirayu','pilar','piribebuy',
+    'pozo-colorado','presidente-franco','primero-de-marzo','puerto-adela','puerto-casado','puerto-irala','puerto-pinasco',
+    'quyquyho','raul-arsenio-oviedo','repatriacion','R-I-3-corrales','san-alberto','salto-del-guaira','san-antonio',
+    'san-carlos-del-apa','san-cosme-y-damian','san-estanislao-santani','san-joaquin','san-jose-obrero',
     'san-juan-bautista-de-las-misiones','san-juan-bautista-de-neembucu','san-juan-del-parana','san-lazaro','san-miguel',
     'san-pedro-del-parana','san-patricio','san-pablo','san-roque-gonzalez-de-santa-cruz','san-pedro-de-ycuamandyyu',
     'san-salvador','san-vicente-pancholo','santa-elena','santa-maria','santa-fe-del-parana','santa-rosa',
@@ -83,7 +81,7 @@ CIUDADES = [
     'ybycui','yby-pyta','yby-yau','ybyrarobana','yguazu','yhu','ypacarai','ypane','yuty','zanja-pyta'
 ]
 
-# ---------- JSON Schema para Structured Outputs ----------
+# ------- JSON Schema (Structured Outputs) -------
 def _nullable_enum(values: List[str]) -> Dict[str, Any]:
     return {"anyOf": [{"enum": values}, {"type": "null"}]}
 
@@ -109,7 +107,6 @@ EXTRACT_SCHEMA: Dict[str, Any] = {
         "m2": _nullable_int(),
         "anno_construccion": _nullable_int(),
         "datosia": _nullable_str(),
-        "hectares": _nullable_int(),  # (typo intencionalmente corregido más abajo)
         "hectareas": _nullable_int(),
         "m2t": _nullable_int(),
         "m2c": _nullable_int(),
@@ -137,112 +134,91 @@ EXTRACT_SCHEMA: Dict[str, Any] = {
     "additionalProperties": False
 }
 
-# ---------- Prompt base ----------
 SYSTEM_INSTRUCTIONS = (
     "Eres un extractor de datos inmobiliarios experto. Devuelve SOLO un objeto JSON que respete EXACTAMENTE "
     "el esquema indicado (sin campos extra) y usa null cuando no haya dato. "
-    "Normaliza sinónimos (ej. pileta → piscina). "
-    "Corrige ortografía/capitalización para coincidir con listas. "
-    "Si detectas un barrio clásico de Asunción sin que se mencione ciudad, asume ciudades='asuncion' y completa 'barrioasu'. "
-    "La clave 'datosia' debe ser una descripción amplia y técnica para análisis interno (no pública). "
-    "La clave 'descripcion' es un copy amable, con emojis y checklist si procede."
+    "Normaliza sinónimos (ej. pileta → piscina). Corrige ortografía/capitalización para coincidir con listas. "
+    "Si detectas un barrio típico de Asunción sin ciudad explícita, asume ciudades='asuncion' y completa 'barrioasu'. "
+    "La clave 'datosia' es una descripción interna y técnica (no pública). "
+    "La clave 'descripcion' es un copy para público, breve, con emojis y checklist si procede."
 )
 
-# ---------- FastAPI ----------
+# ------- FastAPI -------
 app = FastAPI()
 
 class Req(BaseModel):
     description: str
 
-# -------- Util: limpieza de amenidades y llaves --------
 _ALLOWED_KEYS = set(EXTRACT_SCHEMA["properties"].keys())
 
 def _clean_result(d: Dict[str, Any]) -> Dict[str, Any]:
-    # Filtrar claves extra
+    # Filtra claves extra y asegura todas las requeridas
     d = {k: d.get(k, None) for k in _ALLOWED_KEYS}
-    # Normalizar amenidades al catálogo
+    # Normaliza amenidades al catálogo
     if isinstance(d.get("amenidades"), list):
         d["amenidades"] = [a for a in d["amenidades"] if a in AMENIDADES_OPC]
         if not d["amenidades"]:
             d["amenidades"] = None
-    # Alias o errores comunes
-    if d.get("hectares") is not None and d.get("hectareas") is None:
-        d["hectareas"] = d.pop("hectares")
-    else:
-        d.pop("hectares", None)
     return d
 
-# --------- Core: llama al modelo con fallback ----------
-def extract_with_responses_api(description: str, model: str) -> Dict[str, Any]:
-    """Ruta preferida (SDK nuevo)."""
-    resp = client.responses.create(
-        model=model,
-        instructions=SYSTEM_INSTRUCTIONS,
-        input=[{"role": "user", "content": [{"type": "text", "text": description}]}],
-        temperature=0,
-        max_output_tokens=2000,
-        response_format={
-            "type": "json_schema",
-            "json_schema": {"name": "inmueble_extract", "strict": True, "schema": EXTRACT_SCHEMA}
-        },
-    )
-    # Lectura robusta del texto JSON
-    text = getattr(resp, "output_text", None)
-    if not text:
-        for item in getattr(resp, "output", []) or []:
-            if getattr(item, "type", "") == "message":
-                for part in getattr(item, "content", []) or []:
-                    if getattr(part, "type", "") in ("output_text", "text"):
-                        text = getattr(part, "text", None)
-                        if text: break
-            if text: break
-    if not text:
-        raise RuntimeError("No se obtuvo texto del modelo (Responses API).")
-    return json.loads(text)
-
-def extract_with_chat_completions(description: str, model: str) -> Dict[str, Any]:
-    """Fallback para SDKs viejos: JSON mode."""
-    import openai as oai  # compat
-    oai.api_key = OPENAI_API_KEY
+def _call_chat_with_schema(description: str, model: str) -> Dict[str, Any]:
+    """Intenta Structured Outputs (json_schema). Si tu SDK no lo soporta, cae a json_object."""
     messages = [
-        {"role": "system", "content": SYSTEM_INSTRUCTIONS + " Usa exactamente este esquema y SIN campos extra."},
-        {"role": "user", "content": description}
+        {"role": "system", "content": SYSTEM_INSTRUCTIONS},
+        {"role": "user", "content": description},
     ]
-    resp = oai.ChatCompletion.create(  # tipo legacy para máxima compat
-        model=model,
-        messages=messages,
-        temperature=0,
-        max_tokens=2000,
-        response_format={"type": "json_object"},
-    )
-    text = resp["choices"][0]["message"]["content"]
-    return json.loads(text)
+    # 1) Intento con JSON Schema (Structured Outputs)
+    try:
+        if NEW_SDK:
+            resp = client.chat.completions.create(
+                model=model,
+                messages=messages,
+                temperature=0,
+                max_tokens=2000,
+                response_format={
+                    "type": "json_schema",
+                    "json_schema": {
+                        "name": "inmueble_extract",
+                        "strict": True,
+                        "schema": EXTRACT_SCHEMA
+                    }
+                },
+            )
+            text = resp.choices[0].message.content
+        else:
+            # SDK 0.x podría no soportar json_schema → forzamos excepción para ir al fallback
+            raise RuntimeError("json_schema no soportado en SDK legacy; usar fallback json_object")
+        return json.loads(text)
+    except Exception:
+        # 2) Fallback robusto: JSON mode clásico
+        if NEW_SDK:
+            resp = client.chat.completions.create(
+                model=model,
+                messages=messages,
+                temperature=0,
+                max_tokens=2000,
+                response_format={"type": "json_object"},
+            )
+            text = resp.choices[0].message.content
+        else:
+            resp = oai.ChatCompletion.create(
+                model=model,
+                messages=messages,
+                temperature=0,
+                max_tokens=2000,
+                response_format={"type": "json_object"},
+            )
+            text = resp["choices"][0]["message"]["content"]
+        return json.loads(text)
 
 @app.post("/extract")
 async def extract(req: Req):
-    model = DEFAULT_MODEL
     try:
-        if _HAS_NEW_SDK:
-            try:
-                data = extract_with_responses_api(req.description, model)
-            except TypeError as te:
-                # SDK no acepta response_format en responses.create
-                data = extract_with_chat_completions(req.description, model)
-        else:
-            data = extract_with_chat_completions(req.description, model)
-    except Exception as e:
-        # Reintento con modelo “estable” si el default no está disponible en tu cuenta
-        fallback_model = "gpt-4o-mini-2024-07-18"
-        if model != fallback_model:
-            try:
-                if _HAS_NEW_SDK:
-                    data = extract_with_responses_api(req.description, fallback_model)
-                else:
-                    data = extract_with_chat_completions(req.description, fallback_model)
-            except Exception:
-                raise e
-        else:
-            raise e
+        data = _call_chat_with_schema(req.description, OPENAI_MODEL)
+    except Exception:
+        # Fallback de modelo si tu cuenta no tiene el seleccionado
+        fallback = "gpt-4o-mini-2024-07-18"
+        data = _call_chat_with_schema(req.description, fallback)
 
     data = _clean_result(data)
     print("JSON de respuesta desde OpenAI:", json.dumps(data, ensure_ascii=False))
