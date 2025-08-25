@@ -26,6 +26,7 @@ Eres un extractor de datos inmobiliarios experto. Analiza la descripción de tex
   "plantas": Elige de: ['1', '2', '3', '4', '5', '+5'] (string),
   "m2": Número de m² (integer),
   "anno_construccion": Año de construcción (integer),
+  "datosia": Extensa descripción de la propiedad creada solo para que la ia pueda analizar la base de datos y entender de que se trata esta propiedad, no será visible al publico (integer),
   "hectareas": Hectáreas (integer)
   "m2t": Número de m² del terreno (integer)
   "m2c": Número de m² de construcción, (integer)
