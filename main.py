@@ -63,6 +63,7 @@ Devuelve SOLO un JSON con esta estructura EXACTA (usa null si no hay data):
   "cocheras": "uno de ['1','2','3','4','5','6','7','8','9','10','+10'] (si dice 'sin cochera', usa null)" (string|null),
   "plantas": "uno de ['1','2','3','4','5','+5']" (string|null),
   "m2": "m² principal de la unidad" (integer|null),
+  "id": "id de la propiedad" (integer|null),
   "anno_construccion": "año (yyyy) si está" (integer|null),
   "datosia": "descripción técnica amplia SIEMPRE" (string),
   "hectareas": "entero en hectáreas si aplica (campos/estancias/quintas)" (integer|null),
