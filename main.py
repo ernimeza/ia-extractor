@@ -78,7 +78,7 @@ Devuelve SOLO un JSON con esta estructura EXACTA (usa null si no hay data):
   "piso": "número de piso o 'PB' si explícito; si es casa/terreno: null" (string|null),
   "estilo": "una de ['Moderna','Minimalista','Clásica','De campo'] según adjetivos; si no se infiere, null" (string|null),
   "divisa": "GS|$ (según aparezca el precio). Si convertiste desde Gs a USD, pon '$' aquí" (string|null),
-  "ubicacion": "dirección formateada estilo Google Maps, basandote en lo que dice en ´´Dirección:´´ (string|null)
+  "ubicacion": "dirección formateada estilo Google Maps, basandote en lo que dice en ´´Dirección:´´ Si o si en Paraguay, y en la ciudad de la descripción (string|null)
 }
 
 Catálogos de ciudades y barrios (slugs) SON los definidos por tu sistema; respétalos exactamente al completar.
