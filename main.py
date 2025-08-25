@@ -29,9 +29,7 @@ Reglas globales IMPORTANTES:
 - Si aparece un **barrio clásico de Asunción** (p. ej. villa morra, recoleta, carmelitas, etc.) sin ciudad explícita, asume `ciudades='asuncion'` y completa `barrioasu`.
 - Para números: extrae y normaliza. Acepta formatos 'm²', 'm2', 'mts2', 'metros cuadrados'.
 - Para precio: 
-  - Si el texto indica USD (USD, U$S, US$, $, dólares), set `divisa='$'` y pon `precio` como ENTERO USD.
-  - Si solo aparece en Gs. (GS, Gs, guaraníes), set `divisa='GS'` y convierte a USD estimando 1 USD = 7,300 Gs (redondea al entero más cercano). 
-    Si te faltan dígitos (ej. “Gs 700 millones”), interpreta magnitudes correctamente (700 millones = 700_000_000).
+  - Coloca el número que diga en Precio:.
 - Para `habitaciones/banos/cocheras/plantas`, si solo detectas plural sin cantidad (“dos dormitorios”, “3 baños”, “sin cochera”):
   - Si NO hay cantidad: usa null (no se permite "0").
   - Si hay “medio baño/toilette”: redondea a 1 baño (no hay fracciones).
