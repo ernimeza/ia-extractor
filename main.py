@@ -56,7 +56,7 @@ Devuelve SOLO un JSON con esta estructura EXACTA (usa null si no hay data):
   "tipodepropiedad": "casas|departamentos|duplex|terrenos|oficinas|locales|edificios|paseos|depositos|quintas|estancias" (string),
   "ciudades": "slug exacto de ciudad del catálogo" (string),
   "barrioasu": "slug exacto si aplica Asunción; si no, null" (string|null),
-  "precio": "ENTERO en USD; convierte desde Gs si es necesario con 1 USD=7300 Gs" (integer|null),
+  "precio": "Número ENTERO",
   "Barrio": "nombre de barrio libre (si no es Asunción o no está en catálogo); si es Asunción usa también 'barrioasu'" (string|null),
   "habitaciones": "uno de ['1','2','3','4','5','6','7','8','9','10','monoambiente','+10']" (string|null),
   "banos": "uno de ['1','2','3','4','5','6','7','8','9','10','+10']" (string|null),
@@ -78,7 +78,7 @@ Devuelve SOLO un JSON con esta estructura EXACTA (usa null si no hay data):
   "nombredeledificio": "si dice 'Edificio X'/'Torre X'" (string|null),
   "piso": "número de piso o 'PB' si explícito; si es casa/terreno: null" (string|null),
   "estilo": "una de ['Moderna','Minimalista','Clásica','De campo'] según adjetivos; si no se infiere, null" (string|null),
-  "divisa": "GS|$ (según aparezca el precio). Si convertiste desde Gs a USD, pon '$' aquí" (string|null),
+  "divisa": "GS|$ (según aparezca el precio)." (string|null),
   "ubicacion": "dirección formateada estilo Google Maps, basandote en lo que dice en ´´Dirección:´´ Si o si en Paraguay, y en la ciudad de la descripción (string|null)
 }
 
