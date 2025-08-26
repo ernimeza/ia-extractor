@@ -43,7 +43,7 @@ Reglas globales IMPORTANTES:
 - `ciudades`: elegir EXACTAMENTE del catálogo proporcionado en el esquema (slugs en minúscula).
 - `barrioasu`: elegir EXACTAMENTE del catálogo proporcionado (slug). Acepta variaciones con acentos/mayúsculas y normaliza.
 - `datosia`: crea SIEMPRE un párrafo técnico amplio (solo para análisis interno, no público) describiendo la propiedad con lo que se sepa (tipo, m2, habitaciones, amenidades, zona).
-- `descripcion`: copy comercial breve para público, con tono claro, emojis y checklist si hay beneficios.
+- `descripcion`: Copia la descripción completa que dice luego de ´´Descripción´´.
 
 Devuelve SOLO un JSON con esta estructura EXACTA (usa null si no hay data):
 
