@@ -30,9 +30,7 @@ Reglas globales IMPORTANTES:
 - Para números: extrae y normaliza. Acepta formatos 'm²', 'm2', 'mts2', 'metros cuadrados'.
 - Para precio: 
   - Coloca el número que diga en Precio:.
-- Para `habitaciones/banos/cocheras/plantas`, si solo detectas plural sin cantidad (“dos dormitorios”, “3 baños”, “sin cochera”):
-  - Si NO hay cantidad: usa null (no se permite "0").
-  - Si hay “medio baño/toilette”: redondea a 1 baño (no hay fracciones).
+-Para `habitaciones/banos/cocheras/plantas`, coloca la cantidad exacta que diga en la descripción siempre.
 - `m2` = superficie principal (si hay “m2 construidos/área cubierta”, úsalo como `m2c`; si solo hay un m2 sin especificar, colócalo en `m2`).
 - Diferencia superficies:
   - `m2t` = terreno/lote/superficie total/terreno.
