@@ -35,7 +35,7 @@ Reglas globales IMPORTANTES:
 - Diferencia superficies:
   - `m2t` = terreno/lote/superficie total/terreno.
   - `m2c` = construcción/cubiertos/edificados.
-  - `m2` = si no queda claro, toma el número de m² más relevante de la unidad (para departamentos suele ser cubierto).
+  - `m2` = si hay ambas medidas (m2c y m2t) usa el más grande (nomralmente m2t)
 - `estado`: mapea a ['A estrenar','Perfecto','Muy bueno','Bueno'] según lenguaje (“a estrenar/nuevo”→A estrenar; “excelente”→Perfecto; “muy bueno”→Muy bueno; “bueno”→Bueno).
 - `amoblado`: 'Sí' si explicitamente dice que viene amoblado o hay algun campo que diga amoblado:sí, o algo así; 'No' si explícitamente dice sin amoblar o hay un campo que diga amoblado:no, o algo así; si ambiguo, usa null.
 - `tipodepropiedad`: elegir exactamente de: ['casas','departamentos','duplex','terrenos','oficinas','locales','edificios','paseos','depositos','quintas','estancias'].
