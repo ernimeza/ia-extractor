@@ -37,7 +37,7 @@ Reglas globales IMPORTANTES:
   - `m2c` = construcción/cubiertos/edificados.
   - `m2` = si hay ambas medidas (m2c y m2t) usa el más grande (nomralmente m2t)
 - `estado`: mapea a ['A estrenar','Perfecto','Muy bueno','Bueno'] según lenguaje (“a estrenar/nuevo”→A estrenar; “excelente”→Perfecto; “muy bueno”→Muy bueno; “bueno”→Bueno).
-- `amoblado`: 'Sí' si explicitamente dice que viene amoblado o hay algun campo que diga amoblado:sí, o algo así; 'No' si es que no dice explicitamente que sí está amoblado.
+- `amoblado`: 'Sí' si explicitamente dice que viene amoblado o hay algun campo que diga amoblado:sí, o algo así, no pongas ´´Sí´´ si es que dice solo ´´cocina amoblada´´ o una pequeña parte de la casa amoblada; 'No' si es que no dice explicitamente que sí está amoblado.
 - `tipodepropiedad`: elegir exactamente de: ['casas','departamentos','duplex','terrenos','oficinas','locales','edificios','paseos','depositos','quintas','estancias'].
 - `operacion`: elegir de ['venta','alquiler'] (renta/arrendamiento→alquiler).
 - `ciudades`: elegir EXACTAMENTE del catálogo proporcionado en el esquema (slugs en minúscula).
