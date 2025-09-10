@@ -71,7 +71,7 @@ Devuelve SOLO un JSON con esta estructura EXACTA (usa null si no hay data):
   "estado": "una de ['A estrenar','Perfecto','Muy bueno','Bueno','Desarrollo','Remodelada','Regular','Le falta trabajo','En construción','Pre venta'] según adjetivos; si no se infiere, null" (string|null),
   "amenidades": "Selecciona solo opciones del subset: ['Acceso controlado','Área de coworking','Área de parrilla','Área de yoga','Área verde','Bar','Bodega','Cancha de pádel','Cancha de tenis','Cancha de fútbol','Cerradura digital','Cine','Club house','Estacionamiento techado','Generador','Gimnasio','Laguna artificial','Laguna natural','Lavandería','Parque infantil','piscina','Quincho','Salón de eventos','Sala de juegos','Sala de masajes','Sala de reuniones','Sauna','Seguridad 24/7','Solarium','Spa','Terraza','Wi-Fi','Café','Business center'] (normaliza sinónimos) si por ejemplo hay area de parrilla incluir quincho tambien" (array|null),
   "amoblado": "Sí|No" (string|null),
-  "descripcion": "Copia y pega exactamente el texto que dice luego ´´de descripción´´" (string),
+  "descripcion": "Copia y pega exactamente el texto que dice luego ´´de descripción´´, sacando la información ue viene despues, o sea desde descripción hasta ´´Visitas web:´´" (string),
   "nombredeledificio": "si dice 'Edificio X'/'Torre X'" (string|null),
   "piso": "número de piso o 'PB' si explícito; si es casa/terreno: null" (string|null),
   "estilo": "una de ['Moderna','Minimalista','Clásica','De campo','Rústica','De playa','De verano','De lujo','Para inversión','Sustentable','Prefabricada','Inteligente'] según adjetivos; si no se infiere, null" (string|null),
